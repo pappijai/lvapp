@@ -10,12 +10,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
   <title>Laravel + Vue.js App </title>
     <link rel="stylesheet" href="/css/app.css">
 
 </head>
 <body class="hold-transition sidebar-mini">
-<div class="wrapper">
+<div class="wrapper" id="app">
 
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand bg-white navbar-light border-bottom">
@@ -63,17 +65,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tachometer-alt"></i>
-                  <p>
-                    Dashboard
-                  </p>
-                </a>
-              </li>
+          <li class="nav-item">
+            <router-link to="/dashboard" class="nav-link">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Dashboard
+              </p>
+            </router-link>
+          </li>
 
           <li class="nav-item has-treeview menu-close">
-            <a href="#" class="nav-link active">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-cog"></i>
               <p>
                 Management
@@ -97,21 +99,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
           </li>
 
           <li class="nav-item">
-              <a href="#" class="nav-link">
+              <router-link to="/profile" class="nav-link">
                 <i class="nav-icon fas fa-user"></i>
                 <p>
                   Profile
                 </p>
-              </a>
+              </router-link>
           </li>
 
           <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-power-off"></i>
-                <p>
-                  Logout
-                </p>
-              </a>
+            <router-link to="/" class="nav-link">
+              <i class="nav-icon fas fa-power-off"></i>
+              <p>
+                Logout
+              </p>
+            </router-link>
           </li>
 
         </ul>
@@ -128,7 +130,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="container-fluid">
         <div class="row">
 
-          
+          <router-view></router-view>
+
         </div>
         <!-- /.row -->
       </div><!-- /.container-fluid -->
