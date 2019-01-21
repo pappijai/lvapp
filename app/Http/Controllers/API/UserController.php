@@ -196,4 +196,21 @@ class UserController extends Controller
 
         return ["message" => "User Deleted"];
     }
+
+    public function search(){
+        if($search = \Request::get('q')){
+            $users = User::where(function($query) use ($search){
+                $query->where('name','LIKE','%'.$search.'%')->orWhere('email','LIKE','%'.$search.'%');
+            })->paginate(5);
+        }else{
+            $users = User::latest()->paginate(5);
+        }
+        
+        // if($search = \Request::get('q')){
+        //     $users = DB::select('SELECT * FROM users WHERE name LIKE "%'.$search.'%" OR email LIKE "'.$search.'"');
+        // }
+        
+        return $users;
+
+    }
 }

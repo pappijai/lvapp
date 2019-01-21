@@ -16,8 +16,8 @@
                 <div class="card card-widget widget-user">
                 <!-- Add the bg color to the header using any of the bg-* classes -->
                 <div class="widget-user-header text-white" style="background-image: url('./img/cover_image.jpg');">
-                    <h3 class="widget-user-username"></h3>
-                    <h5 class="widget-user-desc">Web Designer</h5>
+                    <h3 class="widget-user-username">{{this.form.name}}</h3>
+                    <h5 class="widget-user-desc">{{this.form.type}}</h5>
                 </div>
                 <div class="widget-user-image">
                     <img class="img-circle img-fluid" :src="getProfilePhoto()" alt="User Avatar">
@@ -208,18 +208,18 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="inputSkills" class="col-sm-2 control-label">Profile Photo</label>
+                                <label for="inputSkills" class="col-sm-12 control-label">Profile Photo (leave empty if not changing| File size must be 5mb maximum)</label>
 
                                 <div class="col-sm-12">
                                 <input type="file" class="form-input" @change="updateProfile" name="photo">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="inputSkills" class="col-sm-12 control-label">Passport(leave empty if not changing| File size must be 5mb maximum)</label>
+                                <label for="inputSkills" class="col-sm-12 control-label">Password</label>
 
                                 <div class="col-sm-12">
                                 <input type="password" class="form-control" name="password" v-model="form.password"
-                                :class="{ 'is-invalid': form.errors.has('password') }" id="inputSkills" placeholder="Passport">
+                                :class="{ 'is-invalid': form.errors.has('password') }" id="inputSkills" placeholder="Password">
                                 <has-error :form="form" field="password"></has-error>
                                 </div>
                             </div>
