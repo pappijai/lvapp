@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+Use Image;
 
 class UserController extends Controller
 {
@@ -30,8 +31,13 @@ class UserController extends Controller
      */
     public function index()
     {
+        //$this->authorize('isAdmin');
         //return DB::select('SELECT * FROM users ORDER BY name ASC');
-        return User::all();
+
+        if(\Gate::allows('isAdmin') || \Gate::allows('isAuthor')){
+            return User::latest()->paginate(5);
+        }
+        
         
     }
 
@@ -101,7 +107,35 @@ class UserController extends Controller
     {
         $user = auth('api')->user();
 
-        return $request->photo;
+        $this->validate($request, [
+            'name' => 'required|string|max:50',
+            'email' => 'required|string|email|max:50|unique:users,email,'.$user->id,
+            'password' => 'sometimes|required|min:6'
+        ]);
+
+        $currentPhoto = $user->photo;
+        if($request->photo != $currentPhoto){
+            $name = time().'.'.explode('/', explode(':',substr($request->photo, 0,strpos
+            ($request->photo, ';')))[1])[1];
+            
+            \Image::make($request->photo)->save(public_path('img/profile/').$name);
+
+            $request->merge(['photo' => $name]);
+
+            $userPhoto = public_path('img/profile/').$currentPhoto;
+
+            if(file_exists($userPhoto)){
+                @unlink($userPhoto);
+            }
+        }
+
+        if(!empty($request->password)){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }
+
+        $user->update($request->all());
+        return ["message" => "Success"];
+
         //return ["message" => "Update information successfully"];
     }
 
@@ -125,14 +159,16 @@ class UserController extends Controller
             'password' => 'sometimes|min:6'
         ]);
 
+        $password = Hash::make($request->password);
+
         $users = DB::update('
            UPDATE users SET
            name = "'.$request->name.'",
            email = "'.$request->email.'",
-           password = "'.Hash::make($request['password']).'",
+           password = "'.$password.'",
            type = "'.$request->type.'",
            bio = "'.$request->bio.'",
-           photo = "'.$request->bio.'",
+           photo = "'.$request->photo.'",
            updated_at = now()
            WHERE id = "'.$id.'"
         
@@ -152,6 +188,8 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+
+        $this->authorize('isAdmin');
         $user = User::findOrFail($id);
 
         $user->delete();

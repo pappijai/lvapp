@@ -10,9 +10,15 @@ require('./bootstrap');
 window.Vue = require('vue');
 import { Form, HasError, AlertError } from 'vform'
 
+import Gate from "./Gate";
+Vue.prototype.$gate = new Gate(window.user);
+
 window.Form = Form; 
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
+
+Vue.component('pagination', require('laravel-vue-pagination'));
+
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -55,7 +61,8 @@ const toast = swal.mixin({
 
 
 Vue.filter('upText', function(text){
-    return text.charAt(0).toUpperCase() + text.slice(1);
+    //return text.charAt(0).toUpperCase() + text.slice(1);
+    return text;
 });
 
 window.Fire = new Vue();
@@ -79,6 +86,12 @@ Vue.component(
 Vue.component(
     'passport-personal-access-tokens',
     require('./components/passport/PersonalAccessTokens.vue')
+);
+
+
+Vue.component(
+    'not-found',
+    require('./components/NotFound.vue')
 );
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));

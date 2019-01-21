@@ -20,7 +20,7 @@
                     <h5 class="widget-user-desc">Web Designer</h5>
                 </div>
                 <div class="widget-user-image">
-                    <img class="img-circle" src="" alt="User Avatar">
+                    <img class="img-circle img-fluid" :src="getProfilePhoto()" alt="User Avatar">
                 </div>
                 <div class="card-footer">
                     <div class="row">
@@ -186,21 +186,25 @@
                                 <label for="inputName" class="col-sm-2 control-label">Name</label>
 
                                 <div class="col-sm-12">
-                                <input type="email" v-model="form.name" name="name" class="form-control" id="inputName" placeholder="Name">
+                                <input type="email" v-model="form.name" name="name" class="form-control" id="inputName"
+                                :class="{ 'is-invalid': form.errors.has('name') }" placeholder="Name">
+                                <has-error :form="form" field="name"></has-error>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="inputEmail" class="col-sm-2 control-label">Email</label>
 
                                 <div class="col-sm-12">
-                                <input type="email" class="form-control" name="email" v-model="form.email" id="inputEmail" placeholder="Email">
+                                <input type="email" class="form-control" name="email" v-model="form.email"
+                                :class="{ 'is-invalid': form.errors.has('email') }" id="inputEmail" placeholder="Email">
+                                <has-error :form="form" field="email"></has-error>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="inputExperience" class="col-sm-2 control-label">Experience</label>
 
                                 <div class="col-sm-12">
-                                <textarea class="form-control" name="experience" id="inputExperience" placeholder="Experience"></textarea>
+                                <textarea class="form-control" v-model="form.bio" name="bio" id="inputBio" placeholder="Experience"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -211,10 +215,12 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="inputSkills" class="col-sm-12 control-label">Passport(leave empty if not changing)</label>
+                                <label for="inputSkills" class="col-sm-12 control-label">Passport(leave empty if not changing| File size must be 5mb maximum)</label>
 
                                 <div class="col-sm-12">
-                                <input type="text" class="form-control" name="passport" id="inputSkills" placeholder="Passport">
+                                <input type="password" class="form-control" name="password" v-model="form.password"
+                                :class="{ 'is-invalid': form.errors.has('password') }" id="inputSkills" placeholder="Passport">
+                                <has-error :form="form" field="password"></has-error>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -253,31 +259,62 @@
         },
         methods:{
             updateInfo(){
+                this.$Progress.start();
                 this.form.put('api/profile')
                 .then(() =>{
-
+                    Fire.$emit('AfterUpdate');
+                    toast({
+                        type: 'success',
+                        title: 'Profile updated successfully'
+                    }) 
+                    this.$Progress.finish();
                 })
                 .catch(() =>{
-
+                    toast({
+                        type: 'error',
+                        title: 'Something wrong'
+                    })                    
+                    this.$Progress.fail();
                 });
             },
             updateProfile(e){
+                
                 let file = e.target.files[0];
-                //console.log(file);
+                console.log(file);
                 let reader = new FileReader();
-                reader.onloadend = (file) => {
-                    //console.log('RESULT', reader.result);
 
-                    this.form.photo = reader.result;
+                if(file['size'] < 5000000){
+                    reader.onloadend = (file) => {
+                        //console.log('RESULT', reader.result);
+    
+                        this.form.photo = reader.result;
+                    }
+                    reader.readAsDataURL(file);
                 }
-                reader.readAsDataURL(file);
+                else{
+                    swal({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: 'You are uploading a large file.',
+
+                    })
+                }
+            },
+            getProfilePhoto(){
+                let photo = (this.form.photo.length > 200) ? this.form.photo : "./img/profile/"+this.form.photo ;
+
+                return photo;
+                //return "img/profile/"+ this.form.photo;
             }
         },
         mounted() {
-            console.log('Component mounted.')
+
         },
         created(){
             axios.get('api/profile').then(({ data }) => (this.form.fill(data)));
+            Fire.$on('AfterUpdate',() => {
+                axios.get('api/profile').then(({ data }) => (this.form.fill(data)));
+            })
         }
     }
 </script>
